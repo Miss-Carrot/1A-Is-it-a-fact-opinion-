@@ -66,18 +66,16 @@
   .item{
     background:var(--card);border:1px solid var(--border);border-radius:10px;
     padding:13px 16px;margin-bottom:10px;
-    display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;
   }
-  .phrase{font-size:1.05rem;line-height:2.1;flex:0 1 auto;}
+  .phrase{font-size:1.05rem;line-height:2.1;}
   .num{color:var(--muted);font-size:0.85rem;margin-right:6px;}
-  .def{color:var(--muted);font-size:0.9rem;flex:1 1 200px;}
+  .def{color:var(--muted);font-size:0.9rem;margin-top:2px;}
   input.answer{
-    width:128px;padding:5px 8px;border-radius:8px;border:1px solid var(--border);
+    width:130px;padding:5px 8px;border-radius:8px;border:1px solid var(--border);
     background:var(--input-bg);color:var(--text);font-size:1rem;text-align:center;
     outline:none;font-family:inherit;margin:0 3px;
     transition:background .15s,border-color .15s;
   }
-  input.answer.wide{width:210px;}
   input.answer:focus{border-color:var(--accent);}
   input.answer.correct{background:var(--green-bg);border-color:var(--green);color:var(--green-text);}
   input.answer.incorrect{background:var(--red-bg);border-color:var(--red);color:var(--red-text);}
@@ -112,7 +110,7 @@
 <body>
 <div class="wrap">
   <h1>Truth &amp; claims: fill in the missing words</h1>
-  <p class="sub">Fill in the missing word(s) in each expression, then press Check. You have 2 minutes.</p>
+  <p class="sub">Fill in the missing word in each expression, then press Check. You have 2 minutes.</p>
 
   <div class="top-bar">
     <div id="timer">02:00</div>
@@ -126,7 +124,7 @@
 
 <div id="finish-overlay">
   <div id="finish-box">
-    <div id="finish-emoji">🌦️</div>
+    <div id="finish-emoji">🌙</div>
     <h2 id="finish-title">Time's up!</h2>
     <p id="final-score"></p>
     <button class="primary" onclick="document.getElementById('finish-overlay').style.display='none'">OK</button>
@@ -134,29 +132,29 @@
 </div>
 
 <script>
-// "{}" marks a gap; answers = accepted words for each gap, in order.
+// "{}" marks a gap; answers = the missing word for each gap, in order.
 const baseData = [
-  { text: "the idea is {} on", answers: [["spot"]],
+  { text: "the idea is {} on", answers: ["spot"],
     def: "completely correct / exactly right" },
-  { text: "to {} true", answers: [["ring"]],
+  { text: "to {} true", answers: ["ring"],
     def: "to sound believable or authentic" },
-  { text: "to strike a {} with me", answers: [["chord"]],
+  { text: "to strike a {} with me", answers: ["chord"],
     def: "to strongly resonate / feel familiar or meaningful" },
-  { text: "to make {}", answers: [["sense"]],
+  { text: "to make {}", answers: ["sense"],
     def: "to be logical or reasonable" },
-  { text: "It is {} not true", answers: [["patently"]],
+  { text: "It is {} not true", answers: ["patently"],
     def: "is obviously / clearly false" },
-  { text: "{}", answers: [["vacuous comments"]], wide: true,
+  { text: "{} comments", answers: ["vacuous"],
     def: "empty remarks" },
-  { text: "{} statements", answers: [["sweeping"]],
+  { text: "{} statements", answers: ["sweeping"],
     def: "overly general claims" },
-  { text: "an {} of truth", answers: [["element"]],
+  { text: "an {} of truth", answers: ["element"],
     def: "a small amount of truth" },
-  { text: "to {} out these {} phrases", answers: [["trot"], ["trite"]],
+  { text: "to {} out these {} phrases", answers: ["trot", "trite"],
     def: "to repeatedly use these overused, clichéd expressions" },
-  { text: "way too {}", answers: [["oversimplistic"]],
+  { text: "way too {}", answers: ["oversimplistic"],
     def: "they are far too simple / lack depth" },
-  { text: "a complete {}", answers: [["fallacy"]],
+  { text: "a complete {}", answers: ["fallacy"],
     def: "a totally false belief or mistaken idea" }
 ];
 
@@ -172,23 +170,22 @@ function shuffle(arr){
 const data = shuffle(baseData);
 
 const scoreMessages = {
-  11: ["🎖️", "Spot on — flawless!"],
-  10: ["🪄", "Pure magic!"],
-  9:  ["🥂", "Cheers to that!"],
-  8:  ["🌻", "Blooming nicely!"],
-  7:  ["🎼", "In tune!"],
-  6:  ["🪙", "Worth its weight!"],
-  5:  ["🧃", "Half full — keep sipping!"],
-  4:  ["🍂", "Slowly gathering!"],
-  3:  ["🧵", "Pulling the thread!"],
-  2:  ["🪺", "Fresh nest — keep building!"],
-  1:  ["🕊️", "A gentle start!"],
-  0:  ["🌦️", "Clouds today — sun tomorrow!"]
+  11: ["🎆", "Fireworks! Flawless!"],
+  10: ["👑", "Royal performance!"],
+  9:  ["🦚", "Wonderfully sharp!"],
+  8:  ["🎻", "Music to my ears!"],
+  7:  ["🧁", "Sweet success!"],
+  6:  ["🌷", "Blooming nicely!"],
+  5:  ["⛵", "Catching the wind!"],
+  4:  ["🍵", "A good start — keep sipping!"],
+  3:  ["🌦️", "Mixed skies — keep going!"],
+  2:  ["🧸", "Gentle progress!"],
+  1:  ["🕊️", "A quiet beginning!"],
+  0:  ["🌙", "Rest, then try again!"]
 };
 
-// Lowercase, trim, drop punctuation, collapse spaces
 function normalize(str){
-  return str.toLowerCase().replace(/[.,!?;:"'’()]/g, "").replace(/\s+/g, " ").trim();
+  return str.toLowerCase().trim().replace(/[.,!?;:"'()]/g, "").replace(/\s+/g, " ");
 }
 
 const quizEl = document.getElementById("quiz");
@@ -216,10 +213,11 @@ data.forEach((item, idx) => {
     if (i < arr.length - 1){
       const input = document.createElement("input");
       input.type = "text";
-      input.className = "answer" + (item.wide ? " wide" : "");
+      input.className = "answer";
       input.autocomplete = "off";
       input.autocapitalize = "off";
       input.spellcheck = false;
+      input.placeholder = "word";
       // No live validation: colours appear only after Check / when time runs out
       input.addEventListener("input", () => input.classList.remove("correct", "incorrect"));
       input.addEventListener("keydown", e => {
@@ -242,7 +240,7 @@ data.forEach((item, idx) => {
   // Kept in the DOM for reference, hidden from the learner via CSS
   const reveal = document.createElement("div");
   reveal.className = "reveal";
-  reveal.textContent = "Correct answer: " + item.answers.map(a => a[0]).join(" / ");
+  reveal.textContent = "Correct answer: " + item.answers.join(", ");
 
   row.appendChild(phrase);
   row.appendChild(def);
@@ -262,7 +260,7 @@ function checkAll(){
         allCorrect = false;
         return;
       }
-      const ok = item.answers[g].map(normalize).includes(typed);
+      const ok = typed === normalize(item.answers[g]);
       inp.classList.toggle("correct", ok);
       inp.classList.toggle("incorrect", !ok);
       if (!ok) allCorrect = false;
